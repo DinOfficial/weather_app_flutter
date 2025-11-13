@@ -1,6 +1,7 @@
 
 
 class WeatherData {
+  final String cityName;
   final double temperature;
   final double windSpeed;
   final int weatherCode;
@@ -11,7 +12,7 @@ class WeatherData {
   final List<double> dailyMinTemperatures;
   final List<int> dailyCodes;
 
-  WeatherData({
+  WeatherData({required this.cityName,
     required this.temperature,
     required this.windSpeed,
     required this.weatherCode,
@@ -20,21 +21,6 @@ class WeatherData {
     required this.dailyDates,
     required this.dailyMaxTemperatures,
     required this.dailyMinTemperatures,
-    required this.dailyCodes,
+    required this.dailyCodes, required ,
   });
-
-
-  factory WeatherData.fromJson(Map<String, dynamic> json){
-    return WeatherData(
-        temperature: json['current']['temperature_2m'].toDouble(),
-        windSpeed: json['current']['wind_speed_10m'].toDouble(),
-        weatherCode: json['current']['weather_code'].toInt(),
-        hourlyTime: List<String>.from(json['hourly']['time']),
-        hourlyTemperature: List<double>.from(json['hourly']['temperature_2m'].map((temp) => temp.toDouble())),
-        dailyDates: List<String>.from(json['daily']['time']),
-        dailyMaxTemperatures: List<double>.from(json['daily']['temperature_2m_max'].map((temp) => temp.toDouble())),
-        dailyMinTemperatures: List<double>.from(json['daily']['temperature_2m_min'].map((temp) => temp.toDouble())),
-        dailyCodes: List<int>.from(json['daily']['weather_code'].map((code) => code.toInt())),
-    );
-  }
 }

@@ -1,19 +1,26 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:weather_app/models/weather_model.dart';
 
 class WeatherService{
   Future<WeatherData> fetchWeather(String city) async{
+
+    city = city.trim();
+    city = city[0].toUpperCase() + city.substring(1);
+
     try{
       // Get City Data
       final geoUrl = Uri.parse('https://geocoding-api.open-meteo.com/v1/search?name=$city&count=1');
       final geoResponse = await http.get(geoUrl);
       final geoData = jsonDecode(geoResponse.body);
 
-      if(geoData['results'] != null || geoData['results'].isEmpty) return throw Exception('City Not Found');
-      final lat = geoData[0]['latitude'];
-      final lon = geoData[0]['longitude'];
+      if (geoData['results'] == null || geoData['results'].isEmpty) {
+        throw Exception('City Not Found');
+      }
+      final lat = geoData['results'][0]['latitude'];
+      final lon = geoData['results'][0]['longitude'];
+      final cityName = geoData['results'][0]['name'];
+
 
     // Get Weather Data
     final weatherUrl = Uri.parse('https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon'
@@ -24,12 +31,25 @@ class WeatherService{
 
     final response = await http.get(weatherUrl);
     final data = jsonDecode(response.body);
-    return WeatherData.fromJson(data);
+    return WeatherData(
+      cityName: cityName, // <-- সংরক্ষিত শহরের নামটি এখানে পাস করুন
+      temperature: data['current']['temperature_2m'].toDouble(),
+      windSpeed: data['current']['wind_speed_10m'].toDouble(),
+      weatherCode: data['current']['weather_code'],
+      hourlyTime: List<String>.from(data['hourly']['time']),
+      hourlyTemperature: List<double>.from(data['hourly']['temperature_2m']),
+      dailyDates: List<String>.from(data['daily']['time']),
+      dailyMaxTemperatures: List<double>.from(data['daily']['temperature_2m_max']),
+      dailyMinTemperatures: List<double>.from(data['daily']['temperature_2m_min']),
+      dailyCodes: List<int>.from(data['daily']['weather_code']),
+        );
 
     }catch(e){
       return throw Exception(e);
     }
   }
+
+
 
   String getWeatherDescription(int code){
     if([0].contains(code)) return 'Clear Sky';
