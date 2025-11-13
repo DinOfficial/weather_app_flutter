@@ -7,7 +7,6 @@ class WeatherApp extends StatefulWidget {
   @override
   State<WeatherApp> createState() => _WeatherAppState();
 }
-
 class _WeatherAppState extends State<WeatherApp> {
   @override
   Widget build(BuildContext context) {
